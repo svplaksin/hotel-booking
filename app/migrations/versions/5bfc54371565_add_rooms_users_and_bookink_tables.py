@@ -1,8 +1,8 @@
-"""Add new tables
+"""Add rooms, users and booking tables
 
-Revision ID: 9202a0471919
-Revises: 71a4e6e07d8b
-Create Date: 2023-11-28 15:33:03.318214
+Revision ID: 5bfc54371565
+Revises: 87c80e1822e7
+Create Date: 2023-12-01 15:41:20.924362
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '9202a0471919'
-down_revision: Union[str, None] = '71a4e6e07d8b'
+revision: str = '5bfc54371565'
+down_revision: Union[str, None] = '87c80e1822e7'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -30,7 +30,7 @@ def upgrade() -> None:
     op.create_table(
         'rooms',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('hotel_id', sa.Integer(), nullable=True),
+        sa.Column('hotel_id', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(), nullable=False),
         sa.Column('description', sa.String(), nullable=False),
         sa.Column('price', sa.Integer(), nullable=False),
@@ -43,21 +43,16 @@ def upgrade() -> None:
     op.create_table(
         'bookings',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('room_id', sa.Integer(), nullable=True),
-        sa.Column('user_id', sa.Integer(), nullable=True),
+        sa.Column('room_id', sa.Integer(), nullable=False),
+        sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('date_from', sa.Date(), nullable=False),
         sa.Column('date_to', sa.Date(), nullable=False),
         sa.Column('price', sa.Integer(), nullable=False),
-        sa.Column('toral_days', sa.Integer(), sa.Computed('(date_to - date_from)', ), nullable=True),
-        sa.Column('total_cost', sa.Integer(), sa.Computed('(date_to - date_from) * price', ), nullable=True),
+        sa.Column('total_days', sa.Integer(), sa.Computed('(date_to - date_from)', ), nullable=False),
+        sa.Column('total_cost', sa.Integer(), sa.Computed('(date_to - date_from) * price', ), nullable=False),
         sa.ForeignKeyConstraint(['room_id'], ['rooms.id'], ),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
         sa.PrimaryKeyConstraint('id')
-    )
-    op.alter_column(
-        "hotels",
-        'room_quantity',
-        new_column_name='rooms_quantity'
     )
     # ### end Alembic commands ###
 

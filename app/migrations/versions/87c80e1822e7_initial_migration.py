@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 71a4e6e07d8b
+Revision ID: 87c80e1822e7
 Revises:
-Create Date: 2023-11-27 14:51:28.092764
+Create Date: 2023-12-01 14:51:00.233766
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '71a4e6e07d8b'
+revision: str = '87c80e1822e7'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -26,8 +26,8 @@ def upgrade() -> None:
         sa.Column('name', sa.String(), nullable=False),
         sa.Column('location', sa.String(), nullable=False),
         sa.Column('services', sa.JSON(), nullable=False),
-        sa.Column('room_quantity', sa.Integer(), nullable=False),
-        sa.Column('image_id', sa.Integer(), nullable=True),
+        sa.Column('rooms_quantity', sa.Integer(), nullable=False),
+        sa.Column('image_id', sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
