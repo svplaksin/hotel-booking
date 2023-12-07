@@ -16,14 +16,6 @@ class Settings(BaseSettings):
         database = f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         return f"postgresql+asyncpg://{user}@{database}"
 
-    @property
-    def ENCODE_KEY(self):
-        return f"{self.ENCODE_KEY}"
-
-    @property
-    def ENCODE_ALGORITHM(self):
-        return f"{self.ENCODE_ALGORITHM}"
-
     # Со 2 версии Pydantic класс Config был заменен на атрибут model_config
     # class Config:
     #     env_file = ".env"
