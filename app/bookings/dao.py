@@ -1,12 +1,12 @@
 from datetime import date
 
-from sqlalchemy import func, select
+from sqlalchemy import func, insert, select
 from app.bookings.rooms.models import Rooms
 from app.dao.base import BaseDAO
 
 from app.bookings.models import Bookings
 
-from app.database import engine, async_session_maker
+from app.database import async_session_maker
 
 
 class BookingDAO(BaseDAO):
@@ -48,7 +48,26 @@ class BookingDAO(BaseDAO):
                 ).where(Rooms.id == room_id).group_by(
                     Rooms.quantity
                 )
-            print(get_rooms_left.compile(engine, compile_kwargs={"literal_binds": True}))
+            # Выводим SQL запрос в консоль для сверки
+            # print(get_rooms_left.compile(engine, compile_kwargs={"literal_binds": True}))
 
             rooms_left = await session.execute(get_rooms_left)
-            print(rooms_left.scalar())
+            rooms_left: int = rooms_left.scalar()
+
+            if rooms_left > 0:
+                get_price = select(Rooms.price).filter_by(id=room_id)
+                price = await session.execute(get_price)
+                price: int = price.scalar()
+                add_booking = insert(Bookings).values(
+                    room_id=room_id,
+                    user_id=user_id,
+                    date_from=date_from,
+                    date_to=date_to,
+                    price=price,
+                ).returning(Bookings)
+
+                new_booking = await session.execute(add_booking)
+                await session.commit()
+                return new_booking.scalar()
+            else:
+                return None
