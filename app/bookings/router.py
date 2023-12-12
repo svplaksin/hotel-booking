@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 
 from app.bookings.dao import BookingDAO
 from app.bookings.schemas import SBooking, SNewBooking
-from app.exceptions import RoomCannotBeBooked
+from app.exceptions import RoomCannotBeBooked, UserMissingException
 from app.users.dependencies import get_current_user
 from app.users.models import Users
 
@@ -14,8 +14,10 @@ router = APIRouter(
 
 
 @router.get("")
-async def get_bookings(user: Users = Depends(get_current_user)) -> list[SBooking]:
-    return await BookingDAO.find_all(user_id=user.id)
+async def get_current_user_bookings(
+    user: Users = Depends(get_current_user)
+) -> list[SBooking]:
+    return await BookingDAO.get_bookings_list(user_id=user.id)
 
 
 @router.post("")
@@ -31,3 +33,14 @@ async def add_booking(
     )
     if not booking:
         raise RoomCannotBeBooked
+
+
+@router.delete("/{booking_id}")
+async def delete_booking(
+    booking_id,
+    user: Users = Depends(get_current_user),
+):
+    if not user:
+        raise UserMissingException
+    else:
+        await BookingDAO.delete(booking_id)

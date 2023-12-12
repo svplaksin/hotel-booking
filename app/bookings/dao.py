@@ -1,9 +1,9 @@
 from datetime import date
 
-from sqlalchemy import func, insert, select
-from app.bookings.rooms.models import Rooms
+from sqlalchemy import delete, func, insert, select
 from app.dao.base import BaseDAO
 
+from app.hotels.rooms.models import Rooms
 from app.bookings.models import Bookings
 
 from app.database import async_session_maker
@@ -24,7 +24,7 @@ class BookingDAO(BaseDAO):
         with booked_rooms as (
             select * from bookings
             where room_id = 1 and
-            (date_from <= '2023-06-20' and date_to >= '2023-05-15')
+            (date_from <= '2023-06-20' or date_to >= '2023-05-15')
         )
         """
         async with async_session_maker() as session:
@@ -71,3 +71,40 @@ class BookingDAO(BaseDAO):
                 return new_booking.scalar()
             else:
                 return None
+
+    @classmethod
+    async def delete(
+        cls,
+        booking_id: int
+    ):
+        async with async_session_maker() as session:
+            # Check if the booking exists
+            get_booking = select(Bookings).where(Bookings.id == int(booking_id))
+            booking = await session.execute(get_booking)
+
+            # Abort is booking not found
+            if not booking:
+                return None
+
+            # Delete the booking
+            delete_booking = delete(Bookings).where(Bookings.id == int(booking_id))
+            await session.execute(delete_booking)
+            await session.commit()
+
+    @classmethod
+    async def get_bookings_list(
+        cls,
+        user_id: int
+    ):
+        async with async_session_maker() as session:
+            query = select(
+                Bookings.__table__.columns,
+                Rooms.__table__.columns,
+            ).join(
+                Rooms, Bookings.room_id == Rooms.id, isouter=True
+            ).where(
+                Bookings.user_id == user_id
+            )
+
+            result = await session.execute(query)
+            return result.mappings().all()
