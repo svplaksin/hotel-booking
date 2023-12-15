@@ -24,15 +24,15 @@ class BookingDAO(BaseDAO):
         with booked_rooms as (
             select * from bookings
             where room_id = 1 and
-            (date_from <= '2023-06-20' or date_to >= '2023-05-15')
+            (date_from <= '2023-06-20' AND date_to >= '2023-05-15')
         )
         """
         async with async_session_maker() as session:
             booked_rooms = select(Bookings).where(
                 (Bookings.room_id == room_id) &
                 (
-                    (Bookings.date_from <= date_from) |
-                    (Bookings.date_to >= date_to)
+                    (Bookings.date_from <= date_to) &
+                    (Bookings.date_to >= date_from)
                 )
             ).cte("booked_rooms")
             """
@@ -98,6 +98,7 @@ class BookingDAO(BaseDAO):
     ):
         async with async_session_maker() as session:
             query = select(
+                # __table__.columns нужен для отсутствия вложенности в ответе Алхимии
                 Bookings.__table__.columns,
                 Rooms.__table__.columns,
             ).join(
