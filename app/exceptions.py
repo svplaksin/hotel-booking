@@ -61,3 +61,11 @@ class RoomCannotBeBooked(HTTPException):
             self, status_code: int = status.HTTP_409_CONFLICT,
             detail: Any = "Не осталось свободных номеров") -> None:
         super().__init__(status_code, detail)
+
+
+class HotelsNotFoundException(HTTPException):
+    def __init__(
+            self,
+            status_code: int = status.HTTP_404_NOT_FOUND,
+            detail: Any = "Не нашлось подходящего отеля") -> None:
+        super().__init__(status_code, detail)
