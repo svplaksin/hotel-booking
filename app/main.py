@@ -1,5 +1,12 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+
+from redis import asyncio as aioredis
 
 
 from app.bookings.router import router as router_bookings
@@ -10,7 +17,14 @@ from app.pages.router import router as router_pages
 from app.images.router import router as router_images
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    redis = aioredis.from_url("redis://localhost:6379", encoding="utf8")
+    FastAPICache.init(RedisBackend(redis), prefix="cache")
+    yield
+
+app = FastAPI(lifespan=lifespan)
+
 
 app.mount("/static", StaticFiles(directory="app/static"), "static")
 

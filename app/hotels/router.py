@@ -1,9 +1,11 @@
+import asyncio
 from datetime import date
 from fastapi import APIRouter
 from app.exceptions import HotelsNotFoundException
 from app.hotels.dao import HotelsDAO
 
 from app.hotels.schemas import SHotels, SHotelsList
+from fastapi_cache.decorator import cache
 
 
 router = APIRouter(
@@ -13,6 +15,7 @@ router = APIRouter(
 
 
 @router.get("/{location}")
+@cache(expire=20)
 async def get_hotels_list(
     location: str,
     date_from: date,
@@ -27,6 +30,7 @@ async def get_hotels_list(
     Ответ пользователю: для каждого отеля должно быть указано: id, name, location,
     services, rooms_quantity, image_id, rooms_left (количество оставшихся номеров).
     """
+    await asyncio.sleep(3)
     hotels_list = await HotelsDAO.find_all(
         location=location,
         date_from=date_from,
