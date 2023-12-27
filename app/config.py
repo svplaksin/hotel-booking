@@ -16,6 +16,13 @@ class Settings(BaseSettings):
         database = f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         return f"postgresql+asyncpg://{user}@{database}"
 
+    SMTP_HOST: str
+    SMTP_PORT: int
+    SMTP_USER: str
+    SMTP_PASS: str
+
+    REDIS_HOST: str
+    REDIS_PORT: int
     # Со 2 версии Pydantic класс Config был заменен на атрибут model_config
     # class Config:
     #     env_file = ".env"
