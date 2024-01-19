@@ -33,3 +33,10 @@ def send_booking_confirmation_email(
     with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
         server.login(settings.SMTP_USER, settings.SMTP_PASS)
         server.send_message(msg_content)
+
+    # Для проверки, если не хочется гонять почту на реальные сервера,
+    # или нет интернета, можно запустить локальный мейл-сервер в отдельном окне:
+    # python -m smtpd -c DebuggingServer -n localhost:1025
+
+    # with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
+    #     server.send_message(msg_content)

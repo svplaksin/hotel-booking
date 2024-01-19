@@ -18,13 +18,14 @@ from app.pages.router import router as router_pages
 from app.images.router import router as router_images
 
 
+app = FastAPI(title="Бронирование Отелей")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     redis = aioredis.from_url(f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}", encoding="utf8")
     FastAPICache.init(RedisBackend(redis), prefix="cache")
     yield
-
-app = FastAPI(lifespan=lifespan)
 
 
 app.mount("/static", StaticFiles(directory="app/static"), "static")
