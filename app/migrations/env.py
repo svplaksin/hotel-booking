@@ -11,7 +11,7 @@ from app.config import settings
 from app.database import Base
 from app.hotels.models import Hotels # noqa
 from app.bookings.models import Bookings # noqa
-from app.bookings.rooms.models import Rooms # noqa
+from app.hotels.rooms.models import Rooms # noqa
 from app.users.models import Users # noqa
 
 
