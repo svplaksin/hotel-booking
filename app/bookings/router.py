@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, BackgroundTasks
+
 from pydantic import TypeAdapter
 
 from app.bookings.dao import BookingDAO
@@ -41,6 +42,10 @@ async def add_booking(
     # send_booking_confirmation_email.delay(booking_dict, user.email)
     # вариант со встроенным BackgroundTasks
     background_tasks.add_task(send_booking_confirmation_email, booking_dict, user.email)
+    return booking_dict
+
+    booking_dict = TypeAdapter(SBooking).validate_python(booking).model_dump()
+    send_booking_confirmation_email.delay(booking_dict, user.email)
     return booking_dict
 
 
