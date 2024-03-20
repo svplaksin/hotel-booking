@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
+
 from pydantic import TypeAdapter
 
 from app.bookings.dao import BookingDAO
@@ -24,6 +25,7 @@ async def get_current_user_bookings(
 
 @router.post("")
 async def add_booking(
+    background_tasks: BackgroundTasks,
     booking: SNewBooking,
     user: Users = Depends(get_current_user),
 ):
@@ -35,6 +37,12 @@ async def add_booking(
     )
     if not booking:
         raise RoomCannotBeBooked
+    booking_dict = TypeAdapter(SBooking).validate_python(booking).model_dump()
+    # вариант с Celery
+    # send_booking_confirmation_email.delay(booking_dict, user.email)
+    # вариант со встроенным BackgroundTasks
+    background_tasks.add_task(send_booking_confirmation_email, booking_dict, user.email)
+    return booking_dict
 
     booking_dict = TypeAdapter(SBooking).validate_python(booking).model_dump()
     send_booking_confirmation_email.delay(booking_dict, user.email)
