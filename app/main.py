@@ -1,5 +1,9 @@
 from contextlib import asynccontextmanager
 
+from sqladmin import Admin
+from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
+from app.database import engine
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
@@ -36,3 +40,12 @@ app.include_router(router_rooms)
 
 app.include_router(router_pages)
 app.include_router(router_images)
+
+
+admin = Admin(app, engine)
+
+
+admin.add_view(UsersAdmin)
+admin.add_view(BookingsAdmin)
+admin.add_view(HotelsAdmin)
+admin.add_view(RoomsAdmin)
