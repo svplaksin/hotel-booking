@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from sqladmin import Admin
+from app.admin.auth import authentication_backend
 from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
 from app.database import engine
 
@@ -42,7 +43,7 @@ app.include_router(router_pages)
 app.include_router(router_images)
 
 
-admin = Admin(app, engine)
+admin = Admin(app, engine, authentication_backend=authentication_backend)
 
 
 admin.add_view(UsersAdmin)
