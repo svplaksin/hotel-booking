@@ -1,6 +1,12 @@
+from typing import TYPE_CHECKING
 from sqlalchemy import JSON, Integer
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
+
+if TYPE_CHECKING:
+    # Убирает предупреждения отсутствия импорта и неприятные подчеркивания в
+    # PyCharm и VSCode
+    from app.hotels.rooms.models import Rooms
 
 
 class Hotels(Base):
@@ -13,6 +19,11 @@ class Hotels(Base):
     rooms_quantity: Mapped[int]
     image_id: Mapped[int]
 
+    rooms: Mapped[list["Rooms"]] = relationship(back_populates="hotel")
+
+    def __str__(self) -> str:
+        return f"Отель {self.name} {self.location[:30]}"
+
 
 # This is code for SQLAlchemy v1
 # class Hotels(Base):
@@ -24,3 +35,8 @@ class Hotels(Base):
 #     services = Column(JSON, nullable=False)
 #     rooms_quantity = Column(Integer, nullable=False)
 #     image_id = Column(Integer)
+
+# rooms = relationship("Rooms", back_populates="hotel")
+
+# def __str__(self):
+#     return f"Отель {self.name} {self.location[:30]}"
